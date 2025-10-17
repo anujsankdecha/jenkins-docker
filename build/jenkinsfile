@@ -1,0 +1,26 @@
+pipeline {
+    agent {
+        label 'jenkins-agent'
+    }
+    options {
+        timeout (time: 1, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '3'))
+    }
+    stages {
+        stage("App code checkout"){
+            steps{
+                git branch: 'main', url: 'https://github.com/anujsankdecha/jenkins-docker.git'
+            }
+        }
+        stage("build docker image"){
+            steps{
+                sh "docker build -t jen-doc:v1 ."
+            }
+        }
+        stage("run docker container"){
+            steps{
+                sh "docker run -dit --name jen-doc -p 8080:80 jen-doc:v1"
+            }
+        }
+    }
+}
